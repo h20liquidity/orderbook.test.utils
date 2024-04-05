@@ -25,6 +25,7 @@ abstract contract OrderBookTestUtils is Test {
     using SafeERC20 for IERC20;
     using Strings for address;
 
+    uint256 constant CONTEXT_VAULT_IO_ROWS = 5;
     address public EXTERNAL_EOA = address(0x654FEf5Fb8A1C91ad47Ba192F7AA81dd3C821427);
 
     IParserV1 public PARSER;
@@ -93,6 +94,34 @@ abstract contract OrderBookTestUtils is Test {
                 ratio = context[2][1];
                 input = context[3][4];
                 output = context[4][4];
+            }
+        }
+    }
+    
+    function getOrderContext(uint256 orderHash) internal pure returns (uint256[][] memory context) {
+        context = new uint256[][](5);
+        {
+            {
+                uint256[] memory baseContext = new uint256[](2);
+                context[0] = baseContext;
+            }
+            {
+                uint256[] memory callingContext = new uint256[](3);
+                // order hash
+                callingContext[0] = orderHash;
+                context[1] = callingContext;
+            }
+            {
+                uint256[] memory calculationsContext = new uint256[](2);
+                context[2] = calculationsContext;
+            }
+            {
+                uint256[] memory inputsContext = new uint256[](CONTEXT_VAULT_IO_ROWS);
+                context[3] = inputsContext;
+            }
+            {
+                uint256[] memory outputsContext = new uint256[](CONTEXT_VAULT_IO_ROWS);
+                context[4] = outputsContext;
             }
         }
     }
