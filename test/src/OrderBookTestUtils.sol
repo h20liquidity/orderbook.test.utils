@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
+
 import {Vm} from "forge-std/Vm.sol";
 import {Test, console2, stdError} from "forge-std/Test.sol";
 import {IOrderBookV3ArbOrderTaker} from "rain.orderbook.interface/interface/IOrderBookV3ArbOrderTaker.sol";
@@ -7,7 +8,7 @@ import {IParserV1} from "rain.interpreter.interface/interface/IParserV1.sol";
 import {IExpressionDeployerV3} from "rain.interpreter.interface/interface/IExpressionDeployerV3.sol";
 import {IInterpreterV2} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
-import { EvaluableConfigV3, SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
+import {EvaluableConfigV3, SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
 import {
     IOrderBookV3,
     IO,
@@ -21,7 +22,6 @@ import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {IRouteProcessor} from "src/interface/IRouteProcessor.sol";
 
 abstract contract OrderBookTestUtils is Test {
-
     using SafeERC20 for IERC20;
     using Strings for address;
 
@@ -40,17 +40,17 @@ abstract contract OrderBookTestUtils is Test {
         IERC20(token).safeApprove(address(ORDERBOOK), amount);
         ORDERBOOK.deposit(address(token), vaultId, amount);
         vm.stopPrank();
-    } 
+    }
 
     function withdrawTokens(address owner, address token, uint256 vaultId, uint256 amount) internal {
         vm.startPrank(owner);
         ORDERBOOK.withdraw(address(token), vaultId, amount);
         vm.stopPrank();
-    } 
+    }
 
     function getVaultBalance(address owner, address token, uint256 vaultId) internal view returns (uint256) {
         return ORDERBOOK.vaultBalance(owner, token, vaultId);
-    } 
+    }
 
     function addOrderBookOrder(
         address orderOwner,
@@ -72,23 +72,21 @@ abstract contract OrderBookTestUtils is Test {
         assertEq(stateChanged, true);
     }
 
-    function moveExternalPrice(
-        address inputToken,
-        address outputToken,
-        uint256 amountIn,
-        bytes memory encodedRoute
-    ) public {
+    function moveExternalPrice(address inputToken, address outputToken, uint256 amountIn, bytes memory encodedRoute)
+        public
+    {
         vm.startPrank(EXTERNAL_EOA);
-
         IERC20(inputToken).safeApprove(address(ROUTE_PROCESSOR), amountIn);
-
         bytes memory decodedRoute = abi.decode(encodedRoute, (bytes));
-
         ROUTE_PROCESSOR.processRoute(inputToken, amountIn, outputToken, 0, EXTERNAL_EOA, decodedRoute);
         vm.stopPrank();
     }
 
-    function getContextInputOutput(Vm.Log[] memory entries) public pure returns (uint256 input, uint256 output, uint256 ratio) {
+    function getContextInputOutput(Vm.Log[] memory entries)
+        public
+        pure
+        returns (uint256 input, uint256 output, uint256 ratio)
+    {
         for (uint256 j = 0; j < entries.length; j++) {
             if (entries[j].topics[0] == keccak256("Context(address,uint256[][])")) {
                 (, uint256[][] memory context) = abi.decode(entries[j].data, (address, uint256[][]));
@@ -97,6 +95,5 @@ abstract contract OrderBookTestUtils is Test {
                 output = context[4][4];
             }
         }
-    } 
-
+    }
 }
