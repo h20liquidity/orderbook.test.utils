@@ -112,6 +112,12 @@ abstract contract OrderBookTestUtils is Test {
             }
         }
     }
+
+    function giveTestAccountsTokens(address token, address from, address to, uint256 amount) internal {
+        vm.startPrank(from);
+        IERC20(token).safeTransfer(to, amount);
+        vm.stopPrank();
+    }
     
     function getOrderContext(uint256 orderHash) internal pure returns (uint256[][] memory context) {
         context = new uint256[][](5);
