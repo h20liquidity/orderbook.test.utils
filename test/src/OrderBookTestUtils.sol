@@ -26,7 +26,7 @@ abstract contract OrderBookTestUtils is Test {
     using Strings for address;
 
     uint256 constant CONTEXT_VAULT_IO_ROWS = 5;
-    address public EXTERNAL_EOA = address(0x654FEf5Fb8A1C91ad47Ba192F7AA81dd3C821427);
+    address public EXTERNAL_EOA;
 
     IParserV1 public PARSER;
     IExpressionDeployerV3 public EXPRESSION_DEPLOYER;
@@ -53,7 +53,7 @@ abstract contract OrderBookTestUtils is Test {
         return ORDERBOOK.vaultBalance(owner, token, vaultId);
     }
 
-    function addOrderBookOrder(
+    function placeOrder(
         address orderOwner,
         bytes memory bytecode,
         uint256[] memory constants,
