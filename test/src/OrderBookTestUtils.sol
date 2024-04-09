@@ -27,6 +27,7 @@ abstract contract OrderBookTestUtils is Test {
 
     uint256 constant CONTEXT_VAULT_IO_ROWS = 5;
     address public EXTERNAL_EOA;
+    address public APPROVED_EOA;
 
     IParserV1 public PARSER;
     IExpressionDeployerV3 public EXPRESSION_DEPLOYER;
@@ -71,6 +72,20 @@ abstract contract OrderBookTestUtils is Test {
         (,, order,) = abi.decode(entries[2].data, (address, address, OrderV2, bytes32));
         assertEq(order.owner, orderOwner);
         assertEq(stateChanged, true);
+    }
+
+    function takeOrder(OrderV2 memory order, bytes memory route, uint256 inputIOIndex, uint256 outputIOIndex)
+        internal
+    {
+        vm.startPrank(APPROVED_EOA);
+
+        TakeOrderConfigV2[] memory innerConfigs = new TakeOrderConfigV2[](1);
+
+        innerConfigs[0] = TakeOrderConfigV2(order, inputIOIndex, outputIOIndex, new SignedContextV1[](0));
+        TakeOrdersConfigV2 memory takeOrdersConfig =
+            TakeOrdersConfigV2(0, type(uint256).max, type(uint256).max, innerConfigs, route);
+        ARB_INSTANCE.arb(takeOrdersConfig, 0);
+        vm.stopPrank();
     }
 
     function moveExternalPrice(address inputToken, address outputToken, uint256 amountIn, bytes memory encodedRoute)
